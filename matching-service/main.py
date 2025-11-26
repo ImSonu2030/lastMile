@@ -24,7 +24,6 @@ def calculate_distance(x1, y1, x2, y2):
 @app.post("/request-ride")
 def request_ride(payload: RideRequest):
     try:
-        # 1. Get Pickup Station Coordinates
         station_res = supabase.table("stations").select("*").eq("id", payload.station_id).single().execute()
         if not station_res.data:
             raise HTTPException(status_code=404, detail="Station not found")
@@ -32,14 +31,12 @@ def request_ride(payload: RideRequest):
         station = station_res.data
         sx, sy = station['x_coordinate'], station['y_coordinate']
 
-        # 2. Get All AVAILABLE Drivers
         drivers_res = supabase.table("driver_locations").select("*").eq("status", "available").execute()
         available_drivers = drivers_res.data
 
         if not available_drivers:
             return {"status": "no_drivers", "message": "No drivers currently available."}
 
-        # 3. Find Nearest Driver
         best_driver = None
         min_dist = float('inf')
 
@@ -49,7 +46,6 @@ def request_ride(payload: RideRequest):
                 min_dist = dist
                 best_driver = driver
 
-        # 4. Create the Ride Record (Matched)
         ride_data = {
             "rider_id": payload.rider_id,
             "pickup_station_id": payload.station_id,
@@ -59,7 +55,6 @@ def request_ride(payload: RideRequest):
         
         request_res = supabase.table("ride_requests").insert(ride_data).execute()
 
-        # 5. Update Driver Status to 'busy' so they don't get matched again
         supabase.table("driver_locations")\
             .update({"status": "busy"})\
             .eq("driver_id", best_driver['driver_id'])\
