@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { supabase } from "../supabaseClient";
 import { useNavigate, Link } from "react-router-dom";
-import { serviceEndpoints } from "../data/serviceEndpoints";
+import { userService } from "../api/userService";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -25,7 +25,7 @@ export default function Login() {
 
     if (data.user) {
       try {
-        const profile = await serviceEndpoints.userService.getProfile(
+        const profile = await userService.getProfile(
           data.user.id
         );
 

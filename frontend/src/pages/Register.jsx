@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate, Link } from 'react-router-dom';
-import { serviceEndpoints } from '../data/serviceEndpoints'; 
+import { userService } from "../api/userService";
 
 export default function Register() {
   const [email, setEmail] = useState('');
@@ -17,7 +17,7 @@ export default function Register() {
     
     if (data.user) {
       try {
-        await serviceEndpoints.userService.register(data.user.id, email, role);
+        await userService.register(data.user.id, email, role);
         
         alert('Registration successful! Please login.');
         navigate('/login');

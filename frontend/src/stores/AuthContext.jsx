@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
-import { serviceEndpoints } from '../data/serviceEndpoints';
+import { userService } from "../api/userService";
 
 const AuthContext = createContext();
 
@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchRole = async (userId) => {
     try {
-      const profile = await serviceEndpoints.userService.getProfile(userId);
+      const profile = await userService.getProfile(userId);
       setRole(profile.role);
     } catch (error) {
       console.error("Failed to fetch role:", error);
