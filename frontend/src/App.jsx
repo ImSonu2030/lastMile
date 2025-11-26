@@ -1,16 +1,16 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './stores/AuthContext';
 import Register from './pages/Register';
-// import Login from './pages/Login'; 
-// import DriverDashboard from './pages/DriverDashboard';
-// import RiderDashboard from './pages/RiderDashboard';
+import Login from './pages/Login';
+import DriverDashboard from './pages/DriverDashboard';
+import RiderDashboard from './pages/RiderDashboard';
 
-// Helper component for protecting routes
 const ProtectedRoute = ({ children, allowedRole }) => {
-  const { user, role } = useAuth();
+  const { user, role, loading } = useAuth();
   
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">Loading...</div>;
   if (!user) return <Navigate to="/login" />;
-  if (allowedRole && role !== allowedRole) return <Navigate to="/" />; // Redirect if wrong role
+  if (allowedRole && role !== allowedRole) return <Navigate to="/" />;
   
   return children;
 };
