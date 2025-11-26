@@ -1,56 +1,104 @@
-import { supabase } from '../supabaseClient';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { supabase } from "../supabaseClient";
+import { useNavigate } from "react-router-dom";
+import { stationService } from "../api/stationService";
 
 export default function RiderDashboard() {
   const navigate = useNavigate();
+  const [stations, setStations] = useState([]);
+  const [selectedStation, setSelectedStation] = useState(null);
+
+  useEffect(() => {
+    loadStations();
+  }, []);
+
+  const loadStations = async () => {
+    try {
+      const data = await stationService.getAllStations();
+      setStations(data);
+    } catch (err) {
+      console.error("Failed to load stations", err);
+    }
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
-    <div className="min-h-screen p-6">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8 bg-gray-800 p-4 rounded-xl shadow-lg border border-gray-700">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">👋</span>
-            <h1 className="text-2xl font-bold text-white">Rider Dashboard</h1>
-          </div>
+    <div className="min-h-screen p-6 bg-gray-900 text-gray-100">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex justify-between items-center mb-8 bg-gray-800 p-4 rounded-xl border border-gray-700">
+          <h1 className="text-2xl font-bold">Rider Dashboard</h1>
           <button
             onClick={handleLogout}
-            className="px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-600/50 rounded-lg transition-all"
+            className="text-red-400 border border-red-600/50 px-4 py-2 rounded"
           >
             Logout
           </button>
         </div>
 
-        <div className="bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700 max-w-lg mx-auto">
-          <h2 className="text-2xl font-bold text-white mb-6 text-center">Request a Ride</h2>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="text-xs text-gray-500 uppercase font-semibold ml-1 mb-1 block">From</label>
-              <input 
-                type="text" 
-                placeholder="Current Location (X, Y)" 
-                className="w-full px-4 py-3 rounded-lg border border-gray-600 bg-gray-700 text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-500 outline-none transition-all"
-              />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-2 bg-gray-800 p-6 rounded-xl border border-gray-700">
+            <h2 className="text-xl font-semibold mb-4">
+              City Map (100x100 Grid)
+            </h2>
+
+            <div className="relative w-full aspect-square bg-gray-900 border-2 border-gray-700 rounded-lg overflow-hidden">
+              <div
+                className="absolute inset-0 opacity-20"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(circle, #4b5563 1px, transparent 1px)",
+                  backgroundSize: "10% 10%",
+                }}
+              ></div>
+
+              {stations.map((station) => (
+                <div
+                  key={station.id}
+                  onClick={() => setSelectedStation(station)}
+                  className={`absolute w-4 h-4 rounded-full cursor-pointer transform -translate-x-1/2 -translate-y-1/2 hover:scale-125 transition-all
+                    ${
+                      selectedStation?.id === station.id
+                        ? "bg-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.8)]"
+                        : "bg-blue-500"
+                    }`}
+                  style={{
+                    left: `${station.x_coordinate}%`,
+                    bottom: `${station.y_coordinate}%`, // Use bottom because Y grows upwards in Cartesian
+                  }}
+                  title={`${station.name} (${station.x_coordinate}, ${station.y_coordinate})`}
+                >
+                  <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs whitespace-nowrap bg-black/70 px-1 rounded">
+                    {station.name}
+                  </span>
+                </div>
+              ))}
             </div>
-            
-            <div>
-              <label className="text-xs text-gray-500 uppercase font-semibold ml-1 mb-1 block">To</label>
-              <input 
-                type="text" 
-                placeholder="Destination (X, Y)" 
-                className="w-full px-4 py-3 rounded-lg border border-gray-600 bg-gray-700 text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-500 outline-none transition-all"
-              />
+          </div>
+
+          <div className="space-y-6">
+            <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
+              <h3 className="font-bold mb-4">Ride Request</h3>
+              <div className="mb-4">
+                <label className="block text-gray-400 text-sm mb-1">
+                  Pickup Station
+                </label>
+                <div className="p-3 bg-gray-700 rounded text-white">
+                  {selectedStation
+                    ? selectedStation.name
+                    : "Select a station on map"}
+                </div>
+              </div>
+              <button
+                disabled={!selectedStation}
+                className="w-full bg-emerald-600 disabled:bg-gray-600 disabled:cursor-not-allowed hover:bg-emerald-500 text-white font-bold py-3 rounded-lg transition-colors"
+              >
+                Request Ride
+              </button>
             </div>
-            
-            <button className="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-4 rounded-lg transition-colors shadow-lg mt-2 flex items-center justify-center gap-2">
-              <span>🚗</span> Find a Driver
-            </button>
           </div>
         </div>
       </div>
