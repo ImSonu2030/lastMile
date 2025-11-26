@@ -1,19 +1,22 @@
-import { useState } from 'react';
-import { supabase } from '../supabaseClient';
-import { useNavigate, Link } from 'react-router-dom';
-import { serviceEndpoints } from '../data/serviceEndpoints'; 
+import { useState } from "react";
+import { supabase } from "../supabaseClient";
+import { useNavigate, Link } from "react-router-dom";
+import { serviceEndpoints } from "../data/serviceEndpoints";
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
     if (error) {
       alert(error.message);
       setLoading(false);
@@ -22,9 +25,11 @@ export default function Login() {
 
     if (data.user) {
       try {
-        const profile = await serviceEndpoints.userService.getProfile(data.user.id);
-        
-        navigate(profile.role === 'driver' ? '/driver' : '/rider');
+        const profile = await serviceEndpoints.userService.getProfile(
+          data.user.id
+        );
+
+        navigate(profile.role === "driver" ? "/driver" : "/rider");
       } catch (err) {
         alert("Failed to fetch user profile. Please try again.");
         console.error(err);
@@ -36,12 +41,18 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-gray-800 rounded-xl shadow-2xl p-8 border border-gray-700">
-        <h2 className="text-3xl font-bold text-center text-white mb-2">Welcome Back</h2>
-        <p className="text-center text-gray-400 mb-8">Login to continue your journey</p>
-        
+        <h2 className="text-3xl font-bold text-center text-white mb-2">
+          Welcome Back
+        </h2>
+        <p className="text-center text-gray-400 mb-8">
+          Login to continue your journey
+        </p>
+
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              <b>Email</b>
+            </label>
             <input
               type="email"
               value={email}
@@ -51,9 +62,11 @@ export default function Login() {
               required
             />
           </div>
-          
+
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              <b>Password</b>
+            </label>
             <input
               type="password"
               value={password}
@@ -69,13 +82,16 @@ export default function Login() {
             disabled={loading}
             className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Logging in...' : 'Sign In'}
+            {loading ? "Logging in..." : "Sign In"}
           </button>
         </form>
 
         <p className="mt-6 text-center text-gray-400">
-          Don't have an account?{' '}
-          <Link to="/register" className="text-blue-400 hover:text-blue-300 font-semibold hover:underline">
+          Don't have an account?{" "}
+          <Link
+            to="/register"
+            className="text-blue-400 hover:text-blue-300 font-semibold hover:underline"
+          >
             Register here
           </Link>
         </p>

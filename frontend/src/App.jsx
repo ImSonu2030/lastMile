@@ -8,6 +8,7 @@ import RiderDashboard from './pages/RiderDashboard';
 const ProtectedRoute = ({ children, allowedRole }) => {
   const { user, role, loading } = useAuth();
   
+  
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">Loading...</div>;
   if (!user) return <Navigate to="/login" />;
   if (allowedRole && role !== allowedRole) return <Navigate to="/" />;

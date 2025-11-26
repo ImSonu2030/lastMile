@@ -36,9 +36,10 @@ export default function Register() {
         
         <form onSubmit={handleRegister} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+            <label className="block text-sm font-medium text-gray-300 mb-2"><b>Email</b></label>
             <input
               type="email"
+              value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 rounded-lg border border-gray-600 bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
               placeholder="you@example.com"
@@ -47,9 +48,10 @@ export default function Register() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+            <label className="block text-sm font-medium text-gray-300 mb-2"><b>Password</b></label>
             <input
               type="password"
+              value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-3 rounded-lg border border-gray-600 bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
               placeholder="••••••••"
@@ -58,7 +60,7 @@ export default function Register() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">I am a...</label>
+            <label className="block text-sm font-medium text-gray-300 mb-2"><b>Role</b></label>
             <div className="relative">
               <select
                 value={role}
