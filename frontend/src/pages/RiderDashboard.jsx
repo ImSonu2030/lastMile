@@ -1,16 +1,51 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../stores/AuthContext";
+import { driverService } from "../api/driverService";
 import { stationService } from "../api/stationService";
+import { matchingService } from "../api/matchingService";
 
 export default function RiderDashboard() {
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const [drivers, setDrivers] = useState([]);
   const [stations, setStations] = useState([]);
+  const [rideStatus, setRideStatus] = useState(null); // 'idle', 'searching', 'matched', 'no_drivers'
   const [selectedStation, setSelectedStation] = useState(null);
 
   useEffect(() => {
     loadStations();
+
+    const interval = setInterval(loadDrivers, 2000);
+    return () => clearInterval(interval);
   }, []);
+
+  const handleRequestRide = async () => {
+    if (!selectedStation || !user) return;
+
+    setRideStatus("searching");
+    try {
+      const result = await matchingService.requestRide(
+        user.id,
+        selectedStation.id
+      );
+
+      if (result.status === "matched") {
+        setRideStatus("matched");
+        alert(
+          `Driver Found! Driver ID: ${result.driver_id} is ${result.distance} units away.`
+        );
+      } else if (result.status === "no_drivers") {
+        setRideStatus("no_drivers");
+        alert("No drivers are currently available. Please try again later.");
+      }
+    } catch (err) {
+      console.error(err);
+      setRideStatus("error");
+      alert("Failed to request ride.");
+    }
+  };
 
   const loadStations = async () => {
     try {
@@ -18,6 +53,15 @@ export default function RiderDashboard() {
       setStations(data);
     } catch (err) {
       console.error("Failed to load stations", err);
+    }
+  };
+
+  const loadDrivers = async () => {
+    try {
+      const data = await driverService.getActiveDrivers();
+      if (data) setDrivers(data);
+    } catch (err) {
+      console.error("Failed to load drivers", err);
     }
   };
 
@@ -42,7 +86,7 @@ export default function RiderDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2 bg-gray-800 p-6 rounded-xl border border-gray-700">
             <h2 className="text-xl font-semibold mb-4">
-              City Map (100x100 Grid)
+              City Map (Live Tracking)
             </h2>
 
             <div className="relative w-full aspect-square bg-gray-900 border-2 border-gray-700 rounded-lg overflow-hidden">
@@ -67,13 +111,27 @@ export default function RiderDashboard() {
                     }`}
                   style={{
                     left: `${station.x_coordinate}%`,
-                    bottom: `${station.y_coordinate}%`, // Use bottom because Y grows upwards in Cartesian
+                    bottom: `${station.y_coordinate}%`,
                   }}
-                  title={`${station.name} (${station.x_coordinate}, ${station.y_coordinate})`}
+                  title={station.name}
                 >
                   <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs whitespace-nowrap bg-black/70 px-1 rounded">
                     {station.name}
                   </span>
+                </div>
+              ))}
+
+              {drivers.map((driver) => (
+                <div
+                  key={driver.driver_id}
+                  className="absolute text-2xl transition-all duration-1000 ease-linear transform -translate-x-1/2 -translate-y-1/2"
+                  style={{
+                    left: `${driver.x_coordinate}%`,
+                    bottom: `${driver.y_coordinate}%`,
+                  }}
+                  title={`Driver: ${driver.status}`}
+                >
+                  🚖
                 </div>
               ))}
             </div>
@@ -81,23 +139,46 @@ export default function RiderDashboard() {
 
           <div className="space-y-6">
             <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
-              <h3 className="font-bold mb-4">Ride Request</h3>
+              <h3 className="font-bold mb-4">Request a Ride</h3>
               <div className="mb-4">
                 <label className="block text-gray-400 text-sm mb-1">
                   Pickup Station
                 </label>
-                <div className="p-3 bg-gray-700 rounded text-white">
+                <div className="p-3 bg-gray-700 rounded text-white border border-gray-600">
                   {selectedStation
                     ? selectedStation.name
                     : "Select a station on map"}
                 </div>
               </div>
               <button
-                disabled={!selectedStation}
-                className="w-full bg-emerald-600 disabled:bg-gray-600 disabled:cursor-not-allowed hover:bg-emerald-500 text-white font-bold py-3 rounded-lg transition-colors"
-              >
-                Request Ride
+                onClick={handleRequestRide}
+                disabled={!selectedStation || rideStatus === "searching"}
+                className={`w-full font-bold py-3 rounded-lg transition-colors shadow-lg
+                ${
+                  rideStatus === "matched"
+                    ? "bg-green-600 hover:bg-green-500"
+                    : "bg-emerald-600 hover:bg-emerald-500"
+                }
+                disabled:bg-gray-600 disabled:cursor-not-allowed text-white`}
+                          >
+                            {rideStatus === "searching"
+                              ? "Finding Driver..."
+                              : rideStatus === "matched"
+                              ? "Driver on the way!"
+                              : "Request Ride"}
               </button>
+            </div>
+
+            <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
+              <h3 className="font-bold mb-2 text-sm text-gray-400">
+                Live Stats
+              </h3>
+              <div className="flex justify-between items-center">
+                <span>Active Drivers</span>
+                <span className="text-xl font-bold text-emerald-400">
+                  {drivers.length}
+                </span>
+              </div>
             </div>
           </div>
         </div>
