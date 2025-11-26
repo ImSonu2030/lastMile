@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate, Link } from 'react-router-dom';
+import { serviceEndpoints } from '../data/serviceEndpoints'; 
 
 export default function Register() {
   const [email, setEmail] = useState('');
@@ -10,13 +11,20 @@ export default function Register() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) return alert(error.message);
     
     if (data.user) {
-      await supabase.from('profiles').insert([{ id: data.user.id, email, role }]);
-      alert('Registration successful! Please login.');
-      navigate('/login');
+      try {
+        await serviceEndpoints.userService.register(data.user.id, email, role);
+        
+        alert('Registration successful! Please login.');
+        navigate('/login');
+      } catch (err) {
+        alert("Account created, but failed to save profile. Please contact support.");
+        console.error(err);
+      }
     }
   };
 

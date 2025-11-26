@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate, Link } from 'react-router-dom';
+import { serviceEndpoints } from '../data/serviceEndpoints'; 
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -20,8 +21,14 @@ export default function Login() {
     }
 
     if (data.user) {
-      const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).single();
-      navigate(profile?.role === 'driver' ? '/driver' : '/rider');
+      try {
+        const profile = await serviceEndpoints.userService.getProfile(data.user.id);
+        
+        navigate(profile.role === 'driver' ? '/driver' : '/rider');
+      } catch (err) {
+        alert("Failed to fetch user profile. Please try again.");
+        console.error(err);
+      }
     }
     setLoading(false);
   };
