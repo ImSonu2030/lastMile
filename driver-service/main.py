@@ -47,3 +47,20 @@ def get_active_drivers():
         return response.data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/assigned-ride/{driver_id}")
+def get_assigned_ride(driver_id: str):
+    try:
+        # Fetch the ride AND the station coordinates (using Supabase join)
+        # Note: This relies on the Foreign Key we set up earlier
+        response = supabase.table("ride_requests")\
+            .select("*, stations(name, x_coordinate, y_coordinate)")\
+            .eq("matched_driver_id", driver_id)\
+            .eq("status", "matched")\
+            .maybe_single()\
+            .execute()
+            
+        return response.data
+    except Exception as e:
+        print("Error fetching ride:", e)
+        raise HTTPException(status_code=500, detail=str(e))

@@ -8,6 +8,11 @@ export const driverService = {
       body: JSON.stringify({ driver_id, x, y, status }),
     }),
 
-  getActiveDrivers: () => 
+  getActiveDrivers: () =>
     httpRequest(`${driverBaseUrl}/active-drivers`, { method: "GET" }),
+
+  getAssignedRide: (driver_id) =>
+    httpRequest(`${driverBaseUrl}/assigned-ride/${driver_id}`, {
+      method: "GET",
+    }),
 };
