@@ -59,7 +59,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('', "${DOCKERHUB_CRED}") {
-                        buildAndPushImage("${DOCKERHUB_REPO}/${STATION_IMAGE}:latest", './station-service', "")
+                        buildAndPushImage("${DOCKERHUB_REPO}/${STAT_IMAGE}:latest", './station-service', "")
                     }
                 }
             }
@@ -69,7 +69,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('', "${DOCKERHUB_CRED}") {
-                        buildAndPushImage("${DOCKERHUB_REPO}/${DRIVER_IMAGE}:latest", './driver-service', "")
+                        buildAndPushImage("${DOCKERHUB_REPO}/${DRIV_IMAGE}:latest", './driver-service', "")
                     }
                 }
             }
@@ -79,7 +79,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('', "${DOCKERHUB_CRED}") {
-                        buildAndPushImage("${DOCKERHUB_REPO}/${MATCHING_IMAGE}:latest", './matching-service', "")
+                        buildAndPushImage("${DOCKERHUB_REPO}/${MATC_IMAGE}:latest", './matching-service', "")
                     }
                 }
             }
