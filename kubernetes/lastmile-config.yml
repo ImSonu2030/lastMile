@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lastmile-config
+  namespace: lastmile
+data:
+  allowed_origins: "http://lastmile.local"
+  
+  # Public URLs for services (useful if services need to link to each other publicly)
+  user_service_url: "http://lastmile.local/api/user"
+  driver_service_url: "http://lastmile.local/api/driver"
