@@ -8,10 +8,11 @@ pipeline {
         FRON_IMAGE = 'lastmile-frontend'
         USER_IMAGE = 'lastmile-user-service'
 
-        VITE_USER_SERVICE = 'http://lastmile.local/api/user'
-        VITE_STATION_SERVICE = 'http://lastmile.local/api/station'
-        VITE_DRIVER_SERVICE = 'http://lastmile.local/api/driver'
-        VITE_MATCHING_SERVICE = 'http://lastmile.local/api/matching'
+        BASE_URL="http://lastmile.local/api"
+        VITE_USER_SERVICE = "${BASE_URL}/user"
+        VITE_DRIVER_SERVICE = "${BASE_URL}/driver"
+        VITE_STATION_SERVICE = "${BASE_URL}/station"
+        VITE_MATCHING_SERVICE = "${BASE_URL}/matching"
 
         VITE_SUPABASE_URL = credentials('lastmile-supabase-url') 
         VITE_SUPABASE_KEY = credentials('lastmile-supabase-key')
@@ -41,15 +42,15 @@ pipeline {
             }
         }
 
-        // stage('Build & Push User Service') {
-        //     steps {
-        //         script {
-        //             docker.withRegistry('', "${DOCKERHUB_CRED}") {
-        //                 buildAndPushImage("${DOCKERHUB_REPO}/${USER_IMAGE}:latest", './user-service', "")
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Build & Push User Service') {
+            steps {
+                script {
+                    docker.withRegistry('', "${DOCKERHUB_CRED}") {
+                        buildAndPushImage("${DOCKERHUB_REPO}/${USER_IMAGE}:latest", './user-service', "")
+                    }
+                }
+            }
+        }
         
     }
 }

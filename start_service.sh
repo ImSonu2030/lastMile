@@ -21,7 +21,7 @@ deploy_resource() {
 # Deploy services
 basepath="./kubernetes"
 fronpath="$basepath/frontend"
-# userpath="$basepath/user-service"
+userpath="$basepath/user-service"
 
 deploy_resource "$basepath/lastmile-config.yml"
 deploy_resource "$basepath/lastmile-secrets.yml"
@@ -29,6 +29,9 @@ deploy_resource "$basepath/lastmile-secrets.yml"
 deploy_resource "$fronpath/frontend-deployment.yml"
 deploy_resource "$fronpath/frontend-svc.yml"
 deploy_resource "$fronpath/frontend-ingress.yml"
+deploy_resource "$userpath/user-service-deployment.yml"
+deploy_resource "$userpath/user-service-svc.yml"
+deploy_resource "$userpath/user-service-ingress.yml"
 
 DOMAIN="lastmile.local"
 minikube_ip=$(minikube ip)
