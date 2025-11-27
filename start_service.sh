@@ -9,8 +9,7 @@ else
   minikube start > /dev/null 2>&1
 fi
 
-minikube addons enable ingress > /dev/null 2>&1
-kubectl create namespace lastmile
+kubectl create namespace lastmile --dry-run=client -o yaml | kubectl apply -f -
 
 deploy_resource() {
   local resource_path="$1"
@@ -22,6 +21,9 @@ deploy_resource() {
 basepath="./kubernetes"
 fronpath="$basepath/frontend"
 userpath="$basepath/user-service"
+statpath="$basepath/station-service"
+drivpath="$basepath/driver-service"
+matcpath="$basepath/matching-service"
 
 deploy_resource "$basepath/lastmile-config.yml"
 deploy_resource "$basepath/lastmile-secrets.yml"
@@ -29,9 +31,22 @@ deploy_resource "$basepath/lastmile-secrets.yml"
 deploy_resource "$fronpath/frontend-deployment.yml"
 deploy_resource "$fronpath/frontend-svc.yml"
 deploy_resource "$fronpath/frontend-ingress.yml"
+
 deploy_resource "$userpath/user-service-deployment.yml"
 deploy_resource "$userpath/user-service-svc.yml"
 deploy_resource "$userpath/user-service-ingress.yml"
+
+deploy_resource "$statpath/station-service-deployment.yml"
+deploy_resource "$statpath/station-service-svc.yml"
+deploy_resource "$statpath/station-service-ingress.yml"
+
+deploy_resource "$drivpath/driver-service-deployment.yml"
+deploy_resource "$drivpath/driver-service-svc.yml"
+deploy_resource "$drivpath/driver-service-ingress.yml"
+
+deploy_resource "$matcpath/matching-service-deployment.yml"
+deploy_resource "$matcpath/matching-service-svc.yml"
+deploy_resource "$matcpath/matching-service-ingress.yml"
 
 DOMAIN="lastmile.local"
 minikube_ip=$(minikube ip)

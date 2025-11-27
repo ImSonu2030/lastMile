@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: driver-service-ingress
+  namespace: lastmile
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+spec:
+  rules:
+  - host: lastmile.local
+    http:
+      paths:
+      - path: /api/driver(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: driver-service
+            port:
+              number: 8000

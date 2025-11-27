@@ -7,6 +7,9 @@ pipeline {
 
         FRON_IMAGE = 'lastmile-frontend'
         USER_IMAGE = 'lastmile-user-service'
+        DRIV_IMAGE = 'lastmile-driver-service'
+        STAT_IMAGE = 'lastmile-station-service'
+        MATC_IMAGE = 'lastmile-matching-service'
 
         BASE_URL="http://lastmile.local/api"
         VITE_USER_SERVICE = "${BASE_URL}/user"
@@ -52,6 +55,35 @@ pipeline {
             }
         }
         
+        stage('Build & Push Station Service') {
+            steps {
+                script {
+                    docker.withRegistry('', "${DOCKERHUB_CRED}") {
+                        buildAndPushImage("${DOCKERHUB_REPO}/${STATION_IMAGE}:latest", './station-service', "")
+                    }
+                }
+            }
+        }
+
+        stage('Build & Push Driver Service') {
+            steps {
+                script {
+                    docker.withRegistry('', "${DOCKERHUB_CRED}") {
+                        buildAndPushImage("${DOCKERHUB_REPO}/${DRIVER_IMAGE}:latest", './driver-service', "")
+                    }
+                }
+            }
+        }
+
+        stage('Build & Push Matching Service') {
+            steps {
+                script {
+                    docker.withRegistry('', "${DOCKERHUB_CRED}") {
+                        buildAndPushImage("${DOCKERHUB_REPO}/${MATCHING_IMAGE}:latest", './matching-service', "")
+                    }
+                }
+            }
+        }
     }
 }
 
