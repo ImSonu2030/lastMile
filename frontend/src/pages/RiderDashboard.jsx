@@ -73,7 +73,7 @@ export default function RiderDashboard() {
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8 bg-gray-800 p-4 rounded-xl border border-gray-700">
           <h1 className="text-2xl font-bold">Rider Dashboard</h1>
-          <button onClick={handleLogout} className="text-red-400 border border-red-600/50 px-4 py-2 rounded">Logout</button>
+          <button onClick={handleLogout} className="text-red-400 border font-bold border-gray-100/20 px-4 py-2 rounded cursor-pointer hover:bg-gray-700 transition-colors duration-200 ">Logout</button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -122,7 +122,7 @@ export default function RiderDashboard() {
                 onClick={handleRequestRide}
                 disabled={!selectedStation || rideStatus === 'searching'}
                 className={`w-full font-bold py-3 rounded-lg transition-colors shadow-lg
-                  ${rideStatus === 'matched' ? 'bg-green-600 hover:bg-green-500' : 'bg-emerald-600 hover:bg-emerald-500'}
+                  ${rideStatus === 'matched' ? 'bg-green-600 hover:bg-green-500 cursor-pointer' : 'bg-emerald-600 hover:bg-emerald-500 cursor-pointer'}
                   disabled:bg-gray-600 disabled:cursor-not-allowed text-white`}
               >
                 {rideStatus === 'searching' ? 'Finding Driver...' : 

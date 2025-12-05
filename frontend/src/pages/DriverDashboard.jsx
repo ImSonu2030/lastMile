@@ -120,10 +120,9 @@ export default function DriverDashboard() {
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8 bg-gray-800 p-4 rounded-xl border border-gray-700">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">🚖</span>
             <h1 className="text-2xl font-bold">Driver Dashboard</h1>
           </div>
-          <button onClick={handleLogout} className="px-4 py-2 bg-red-600/20 text-red-400 border border-red-600/50 rounded-lg">
+          <button onClick={handleLogout} className="text-red-400 border font-bold border-gray-100/20 px-4 py-2 rounded cursor-pointer hover:bg-gray-700 transition-colors duration-200 ">
             Logout
           </button>
         </div>
@@ -146,8 +145,8 @@ export default function DriverDashboard() {
               {!currentRide ? (
                 <button 
                   onClick={toggleOnline} 
-                  className={`w-full font-bold py-3 rounded-lg transition-colors shadow-lg
-                    ${isOnline ? 'bg-yellow-600 hover:bg-yellow-500' : 'bg-green-600 hover:bg-green-500'} text-white`}
+                  className={`w-full font-bold py-3 rounded-lg transition-colors shadow-lg cursor-pointer
+                    ${isOnline ? 'bg-red-600 hover:bg-red-500' : 'bg-green-600 hover:bg-green-500'} text-white`}
                 >
                   {isOnline ? 'Go Offline' : 'Go Online'}
                 </button>
