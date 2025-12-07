@@ -10,9 +10,11 @@ pipeline {
         DRIV_IMAGE = 'lastmile-driver-service'
         STAT_IMAGE = 'lastmile-station-service'
         MATC_IMAGE = 'lastmile-matching-service'
+        TRIP_IMAGE = 'lastmile-trip-service'
 
         BASE_URL="http://lastmile.local/api"
         VITE_USER_SERVICE = "${BASE_URL}/user"
+        VITE_TRIP_SERVICE = "${BASE_URL}/trip"
         VITE_DRIVER_SERVICE = "${BASE_URL}/driver"
         VITE_STATION_SERVICE = "${BASE_URL}/station"
         VITE_MATCHING_SERVICE = "${BASE_URL}/matching"
@@ -36,7 +38,8 @@ pipeline {
                                        "--build-arg VITE_USER_SERVICE=${VITE_USER_SERVICE} " +
                                        "--build-arg VITE_STATION_SERVICE=${VITE_STATION_SERVICE} " +
                                        "--build-arg VITE_DRIVER_SERVICE=${VITE_DRIVER_SERVICE} " +
-                                       "--build-arg VITE_MATCHING_SERVICE=${VITE_MATCHING_SERVICE}"
+                                       "--build-arg VITE_MATCHING_SERVICE=${VITE_MATCHING_SERVICE}"+
+                                       "--build-arg VITE_TRIP_SERVICE=${VITE_TRIP_SERVICE}"
 
                     docker.withRegistry('', "${DOCKERHUB_CRED}") {
                         buildAndPushImage("${DOCKERHUB_REPO}/${FRON_IMAGE}:latest", './frontend', frontendArgs)
@@ -80,6 +83,16 @@ pipeline {
                 script {
                     docker.withRegistry('', "${DOCKERHUB_CRED}") {
                         buildAndPushImage("${DOCKERHUB_REPO}/${MATC_IMAGE}:latest", './matching-service', "")
+                    }
+                }
+            }
+        }
+
+        stage('Build & Push Trip Service') {
+            steps {
+                script {
+                    docker.withRegistry('', "${DOCKERHUB_CRED}") {
+                        buildAndPushImage("${DOCKERHUB_REPO}/${TRIP_IMAGE}:latest", './trip-service', "")
                     }
                 }
             }
