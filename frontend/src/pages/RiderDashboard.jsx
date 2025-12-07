@@ -12,7 +12,11 @@ export default function RiderDashboard() {
   const [stations, setStations] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [selectedStation, setSelectedStation] = useState(null);
-  const [rideStatus, setRideStatus] = useState(null); // 'idle', 'searching', 'matched', 'no_drivers'
+  
+  const [destination, setDestination] = useState('');
+  const [arrivalTime, setArrivalTime] = useState('');
+  
+  const [rideStatus, setRideStatus] = useState(null);
 
   useEffect(() => {
     loadStations();
@@ -43,11 +47,19 @@ export default function RiderDashboard() {
   };
 
   const handleRequestRide = async () => {
-    if (!selectedStation || !user) return;
+    if (!selectedStation || !user || !destination || !arrivalTime) {
+        alert("Please select a station, destination, and arrival time.");
+        return;
+    }
     
     setRideStatus('searching');
     try {
-      const result = await matchingService.requestRide(user.id, selectedStation.id);
+      const result = await matchingService.requestRide(
+          user.id, 
+          selectedStation.id,
+          destination,
+          arrivalTime
+      );
       
       if (result.status === 'matched') {
         setRideStatus('matched');
@@ -114,10 +126,33 @@ export default function RiderDashboard() {
               <h3 className="font-bold mb-4">Request a Ride</h3>
               <div className="mb-4">
                 <label className="block text-gray-400 text-sm mb-1">Pickup Station</label>
-                <div className="p-3 bg-gray-700 rounded text-white border border-gray-600">
-                  {selectedStation ? selectedStation.name : "Select a station on map"}
+                <div className={`p-3 rounded text-white border ${selectedStation ? 'bg-gray-700 border-gray-600' : 'bg-red-900/20 border-red-500/50'}`}>
+                  {selectedStation ? selectedStation.name : "📍 Select a station on the map"}
                 </div>
               </div>
+
+              <div className="mb-4">
+                <label className="block text-gray-400 text-sm mb-1">Destination</label>
+                <input 
+                  type="text" 
+                  className="w-full p-3 bg-gray-700 rounded text-white border border-gray-600 focus:ring-2 focus:ring-emerald-500 outline-none"
+                  placeholder="e.g. Office, Home"
+                  value={destination}
+                  onChange={(e) => setDestination(e.target.value)}
+                />
+              </div>
+
+              {/* [New] Arrival Time Input */}
+              <div className="mb-4">
+                <label className="block text-gray-400 text-sm mb-1">Arrival Time at Metro</label>
+                <input 
+                  type="time" 
+                  className="w-full p-3 bg-gray-700 rounded text-white border border-gray-600 focus:ring-2 focus:ring-emerald-500 outline-none"
+                  value={arrivalTime}
+                  onChange={(e) => setArrivalTime(e.target.value)}
+                />
+              </div>
+
               <button 
                 onClick={handleRequestRide}
                 disabled={!selectedStation || rideStatus === 'searching'}

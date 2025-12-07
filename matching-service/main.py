@@ -17,6 +17,8 @@ app.add_middleware(
 class RideRequest(BaseModel):
     rider_id: str
     station_id: str
+    destination: str
+    arrival_time: str
 
 def calculate_distance(x1, y1, x2, y2):
     return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
@@ -50,7 +52,9 @@ def request_ride(payload: RideRequest):
             "rider_id": payload.rider_id,
             "pickup_station_id": payload.station_id,
             "matched_driver_id": best_driver['driver_id'],
-            "status": "matched"
+            "status": "matched",
+            "destination": payload.destination, 
+            "arrival_time": payload.arrival_time
         }
         
         request_res = supabase.table("ride_requests").insert(ride_data).execute()

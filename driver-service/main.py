@@ -115,12 +115,29 @@ def update_location(data: LocationUpdate):
 def get_assigned_ride(driver_id: str):
     try:
         supabase = create_client(url, key)
-        response = supabase.table("ride_requests")\
-            .select("*, stations(name, x_coordinate, y_coordinate)")\
+        ride_res = supabase.table("ride_requests")\
+            .select("*")\
             .eq("matched_driver_id", driver_id)\
             .eq("status", "matched")\
-            .maybe_single()\
             .execute()
-        return response.data
+        
+        if not ride_res.data or len(ride_res.data) == 0:
+            return None
+            
+        ride = ride_res.data[0]
+
+        station_id = ride.get("pickup_station_id")
+        if station_id:
+            station_res = supabase.table("stations")\
+                .select("name, x_coordinate, y_coordinate")\
+                .eq("id", station_id)\
+                .execute()
+            
+            if station_res.data and len(station_res.data) > 0:
+                ride['stations'] = station_res.data[0]
+            
+        return ride
+        
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error fetching assigned ride: {e}")
+        return None
