@@ -24,7 +24,6 @@ userpath="$basepath/user-service"
 statpath="$basepath/station-service"
 drivpath="$basepath/driver-service"
 matcpath="$basepath/matching-service"
-trippath="$basepath/trip-service"
 
 deploy_resource "$basepath/lastmile-config.yml"
 deploy_resource "$basepath/lastmile-secrets.yml"
@@ -48,10 +47,6 @@ deploy_resource "$drivpath/driver-service-ingress.yml"
 deploy_resource "$matcpath/matching-service-deployment.yml"
 deploy_resource "$matcpath/matching-service-svc.yml"
 deploy_resource "$matcpath/matching-service-ingress.yml"
-
-deploy_resource "$trippath/trip-service-deployment.yml"
-deploy_resource "$trippath/trip-service-svc.yml"
-deploy_resource "$trippath/trip-service-ingress.yml"
 
 DOMAIN="lastmile.local"
 minikube_ip=$(minikube ip)
