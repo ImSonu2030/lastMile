@@ -141,3 +141,57 @@ def get_assigned_ride(driver_id: str):
     except Exception as e:
         print(f"Error fetching assigned ride: {e}")
         return None
+
+class RideCompletion(BaseModel):
+    ride_id: str
+    driver_id: str
+    final_x: float
+    final_y: float
+
+@app.post("/complete-ride")
+def complete_ride(payload: RideCompletion):
+    try:
+        supabase = create_client(url, key)
+        
+        # 1. Update Ride Status
+        supabase.table("ride_requests")\
+            .update({"status": "completed"})\
+            .eq("id", payload.ride_id)\
+            .execute()
+            
+        # 2. Update Driver Status AND Location
+        supabase.table("driver_locations")\
+            .update({
+                "status": "available",
+                "x_coordinate": payload.final_x, # Update DB with final location
+                "y_coordinate": payload.final_y
+            })\
+            .eq("driver_id", payload.driver_id)\
+            .execute()
+
+        return {"status": "success"}
+
+    except Exception as e:
+        print(f"Error completing ride: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/location/{driver_id}")
+def get_driver_location(driver_id: str):
+    try:
+        supabase = create_client(url, key)
+        # Fetch the specific driver's location
+        response = supabase.table("driver_locations")\
+            .select("*")\
+            .eq("driver_id", driver_id)\
+            .single()\
+            .execute()
+        
+        if not response.data:
+            # Return default if no record exists yet
+            return {"x_coordinate": 10, "y_coordinate": 10}
+            
+        return response.data
+    except Exception as e:
+        print(f"Error fetching location: {e}")
+        # Fallback to default on error
+        return {"x_coordinate": 10, "y_coordinate": 10}

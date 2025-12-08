@@ -10,24 +10,47 @@ export default function DriverDashboard() {
 
   const [isOnline, setIsOnline] = useState(false);
   const [isDriving, setIsDriving] = useState(false);
-  const [location, setLocation] = useState({ x: 10, y: 10 });
+  // Initialize as null to distinguish between "loading" and "default" state
+  const [location, setLocation] = useState(null);
   const [currentRide, setCurrentRide] = useState(null);
 
   const intervalRef = useRef(null);
   const pollingRef = useRef(null);
   const socketRef = useRef(null);
 
+  // 1. Fetch Last Known Location on Mount
   useEffect(() => {
-    if (isOnline && user && !socketRef.current) {
+    if (user) {
+      driverService.getDriverLocation(user.id)
+        .then((data) => {
+          if (data) {
+            setLocation({ x: data.x_coordinate, y: data.y_coordinate });
+          } else {
+            setLocation({ x: 10, y: 10 }); // Default fallback
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to load location", err);
+          setLocation({ x: 10, y: 10 });
+        });
+    }
+  }, [user]);
+
+  // 2. WebSocket Connection
+  useEffect(() => {
+    // Only connect if online, user exists, AND location is loaded
+    if (isOnline && user && !socketRef.current && location) {
+      // FIX: Typo fixed here (added space between const and wsUrl)
       const wsUrl = `${import.meta.env.VITE_DRIVER_SERVICE.replace(
         "http",
         "ws"
       )}/ws/driver/${user.id}`;
+      
       const ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
         console.log("Connected to Driver Cloud");
-        // Send initial location immediately
+        // Send current known location immediately
         ws.send(
           JSON.stringify({
             x: location.x,
@@ -48,10 +71,12 @@ export default function DriverDashboard() {
     return () => {
       if (socketRef.current) socketRef.current.close();
     };
-  }, [isOnline, user]); // Removed 'location' from deps to prevent reconnect loops
+  }, [isOnline, user]); 
 
+  // 3. Check for Rides & Start Driving
   useEffect(() => {
-    if (!user || !isOnline || isDriving || currentRide) return;
+    // Guard: Don't check rides if location isn't loaded yet
+    if (!user || !isOnline || isDriving || currentRide || !location) return;
 
     const checkRide = async () => {
       try {
@@ -59,9 +84,19 @@ export default function DriverDashboard() {
         if (ride) {
           console.log("Ride Assigned!", ride);
           setCurrentRide(ride);
-          // Ensure we pass the 'stations' object (which comes from the backend join/fetch)
+
           if (ride.stations) {
-            startDrivingToTarget(ride.stations);
+            // FIX: Calculate distance BEFORE starting simulation
+            const dx = ride.stations.x_coordinate - location.x;
+            const dy = ride.stations.y_coordinate - location.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            // Only start driving if we are NOT already there (tolerance 0.5)
+            if (distance > 0.5) {
+              startDrivingToTarget(ride.stations, ride.id);
+            } else {
+               console.log("Driver already at station.");
+            }
           } else {
             console.error("Ride assigned but no station data found:", ride);
           }
@@ -73,11 +108,11 @@ export default function DriverDashboard() {
 
     pollingRef.current = setInterval(checkRide, 3000);
     return () => clearInterval(pollingRef.current);
-  }, [user, isOnline, isDriving, currentRide]);
+  }, [user, isOnline, isDriving, currentRide, location]);
 
   const handleLogout = async () => {
     stopSimulation();
-    if (user)
+    if (user && location)
       await driverService.updateLocation(
         user.id,
         location.x,
@@ -89,6 +124,8 @@ export default function DriverDashboard() {
   };
 
   const toggleOnline = async () => {
+    if (!location) return; // Prevent toggling if location hasn't loaded
+
     if (isOnline) {
       setIsOnline(false);
       stopSimulation();
@@ -101,6 +138,7 @@ export default function DriverDashboard() {
         );
     } else {
       setIsOnline(true);
+      // Use the FETCHED location, not the default (10,10)
       if (user)
         await driverService.updateLocation(
           user.id,
@@ -116,7 +154,7 @@ export default function DriverDashboard() {
     setIsDriving(false);
   };
 
-  const startDrivingToTarget = (targetStation) => {
+  const startDrivingToTarget = (targetStation, rideId) => {
     if (!targetStation) return;
 
     setIsDriving(true);
@@ -126,14 +164,34 @@ export default function DriverDashboard() {
       setLocation((prev) => {
         const dx = targetStation.x_coordinate - prev.x;
         const dy = targetStation.y_coordinate - prev.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        const dist = Math.sqrt(dx * dx + dy * dy);
 
-        if (distance < 0.5) {
+        // --- ARRIVAL LOGIC ---
+        if (dist < 0.5) {
           clearInterval(intervalRef.current);
           setIsDriving(false);
-          alert(`ARRIVED at ${targetStation.name}! Waiting for rider...`);
-          return prev;
+          alert(`ARRIVED at ${targetStation.name}! Ride Completed.`);
+          
+          // Complete the ride in backend so it doesn't get fetched again
+          if (rideId && user) {
+              // Pass the final coordinates (targetStation.x/y) here
+              driverService.completeRide(
+                  rideId, 
+                  user.id, 
+                  targetStation.x_coordinate, 
+                  targetStation.y_coordinate
+              )
+              .then(() => {
+                  console.log("Ride completed successfully");
+                  setCurrentRide(null); 
+              })
+              .catch(err => console.error("Failed to complete ride", err));
+          }
+
+          // Snap to exact location
+          return { x: targetStation.x_coordinate, y: targetStation.y_coordinate };
         }
+        // ---------------------
 
         const speed = 0.5;
         const angle = Math.atan2(dy, dx);
@@ -177,6 +235,10 @@ export default function DriverDashboard() {
           </button>
         </div>
 
+        {/* Loading State */}
+        {!location ? (
+           <div className="text-center text-gray-400 mt-10">Loading driver location...</div>
+        ) : (
         <div className="grid md:grid-cols-2 gap-6">
           <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
@@ -234,6 +296,7 @@ export default function DriverDashboard() {
             </div>
           </div>
         </div>
+        )}
       </div>
     </div>
   );

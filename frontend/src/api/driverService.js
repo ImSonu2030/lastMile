@@ -15,4 +15,20 @@ export const driverService = {
     httpRequest(`${driverBaseUrl}/assigned-ride/${driver_id}`, {
       method: "GET",
     }),
+
+  completeRide: (ride_id, driver_id, x, y) =>
+    httpRequest(`${driverBaseUrl}/complete-ride`, {
+      method: "POST",
+      body: JSON.stringify({ 
+        ride_id, 
+        driver_id,
+        final_x: x,  // Send final coordinates
+        final_y: y 
+      }),
+    }),
+
+  getDriverLocation: (driver_id) =>
+    httpRequest(`${driverBaseUrl}/location/${driver_id}`, {
+      method: "GET",
+    }),
 };
