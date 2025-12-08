@@ -52,9 +52,12 @@ async def driver_socket(websocket: WebSocket, driver_id: str):
     try:
         while True:
             data = await websocket.receive_json()
+            email = data.get('email', '')
+            name = email.split('@')[0] if '@' in email else "Driver"
             
             payload = {
                 "driver_id": driver_id,
+                "name": name,
                 "x_coordinate": data['x'],
                 "y_coordinate": data['y'],
                 "status": data['status'],

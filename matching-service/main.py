@@ -26,6 +26,23 @@ def calculate_distance(x1, y1, x2, y2):
 @app.post("/request-ride")
 def request_ride(payload: RideRequest):
     try:
+        # --- FIX: Prevent Double Booking ---
+        # Check if this rider already has a ride with 'matched' status
+        existing_ride = supabase.table("ride_requests")\
+            .select("*")\
+            .eq("rider_id", payload.rider_id)\
+            .eq("status", "matched")\
+            .execute()
+        
+        # If data exists, it means the rider is already matched.
+        # We return a specific status so the frontend can handle it (or ignore it).
+        if existing_ride.data and len(existing_ride.data) > 0:
+            return {
+                "status": "error", 
+                "message": "Ride already in progress."
+            }
+        # -----------------------------------
+
         station_res = supabase.table("stations").select("*").eq("id", payload.station_id).single().execute()
         if not station_res.data:
             raise HTTPException(status_code=404, detail="Station not found")
@@ -42,6 +59,9 @@ def request_ride(payload: RideRequest):
         best_driver = None
         min_dist = float('inf')
 
+        # Logic: Find nearest driver.
+        # If 'dist < min_dist', we pick the new closer driver.
+        # If 'dist == min_dist', we do nothing, effectively keeping the one we already found ("pick any one").
         for driver in available_drivers:
             dist = calculate_distance(sx, sy, driver['x_coordinate'], driver['y_coordinate'])
             if dist < min_dist:
