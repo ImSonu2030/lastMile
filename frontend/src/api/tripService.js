@@ -1,19 +1,22 @@
 import { httpRequest } from "./httpClient";
+
 const tripBaseUrl = import.meta.env.VITE_TRIP_SERVICE;
 
 export const tripService = {
-  createTrip: (ride_request_id, driver_id, rider_id) =>
-    httpRequest(`${tripBaseUrl}/create`, {
+  createTrip: (tripData) =>
+    httpRequest(`${tripBaseUrl}/trips`, {
       method: "POST",
-      body: JSON.stringify({ ride_request_id, driver_id, rider_id }),
+      body: JSON.stringify(tripData),
     }),
-    
-  startTrip: (trip_id) =>
-    httpRequest(`${tripBaseUrl}/${trip_id}/start`, { method: "POST" }),
-    
-  completeTrip: (trip_id) =>
-    httpRequest(`${tripBaseUrl}/${trip_id}/complete`, { method: "POST" }),
-    
-  getCurrentTrip: (driver_id) =>
-    httpRequest(`${tripBaseUrl}/current/${driver_id}`, { method: "GET" })
+
+  getTrip: (tripId) =>
+    httpRequest(`${tripBaseUrl}/trips/${tripId}`, {
+      method: "GET",
+    }),
+
+  updateTripStatus: (tripId, status) =>
+    httpRequest(`${tripBaseUrl}/trips/${tripId}/status`, {
+      method: "PATCH",
+      body: JSON.stringify({ status }),
+    }),
 };

@@ -26,7 +26,8 @@ export default function DriverDashboard() {
       const ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
-        console.log("Connected to Driver service");
+        console.log("Connected to Driver Cloud");
+        // Send initial location immediately
         ws.send(
           JSON.stringify({
             x: location.x,
@@ -35,7 +36,7 @@ export default function DriverDashboard() {
           })
         );
       };
-      ws.onclose = () => console.log("Disconnected from the service");
+      ws.onclose = () => console.log("Disconnected from Cloud");
       ws.onerror = (e) => console.error("Websocket error", e);
 
       socketRef.current = ws;
@@ -47,7 +48,7 @@ export default function DriverDashboard() {
     return () => {
       if (socketRef.current) socketRef.current.close();
     };
-  }, [isOnline, user]);
+  }, [isOnline, user]); // Removed 'location' from deps to prevent reconnect loops
 
   useEffect(() => {
     if (!user || !isOnline || isDriving || currentRide) return;
@@ -58,6 +59,7 @@ export default function DriverDashboard() {
         if (ride) {
           console.log("Ride Assigned!", ride);
           setCurrentRide(ride);
+          // Ensure we pass the 'stations' object (which comes from the backend join/fetch)
           if (ride.stations) {
             startDrivingToTarget(ride.stations);
           } else {
