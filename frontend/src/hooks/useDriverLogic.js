@@ -36,7 +36,14 @@ export function useDriverLogic(user) {
       socketRef.current.close();
       socketRef.current = null;
     }
-    return () => socketRef.current?.close();
+    
+    //FIX: Ensure ref is nulled on cleanup so re-runs can reconnect
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.close();
+        socketRef.current = null;
+      }
+    };
   }, [isOnline, user]); // Removed location dependency to avoid reconnect loops
 
   // 3. Polling for Rides & Driving Logic
