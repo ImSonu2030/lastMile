@@ -25,7 +25,6 @@ export default function DriverDashboard() {
   return (
     <div className="min-h-screen p-6 bg-gray-900 text-gray-100">
       <div className="max-w-4xl mx-auto">
-        {/* Pass the driverName here */}
         <Header 
           title="Driver Dashboard" 
           onLogout={handleLogout} 

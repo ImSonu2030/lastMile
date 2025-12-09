@@ -44,13 +44,11 @@ def get_assigned_ride_db(driver_id: str):
     return ride
 
 def complete_ride_transaction(ride_id: str, driver_id: str, final_x: float, final_y: float):
-    # 1. Update Ride Status
     supabase.table("ride_requests")\
         .update({"status": "completed"})\
         .eq("id", ride_id)\
         .execute()
         
-    # 2. Update Driver Status AND Location
     return supabase.table("driver_locations")\
         .update({
             "status": "available",

@@ -12,5 +12,4 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include the router containing all endpoints
 app.include_router(router)

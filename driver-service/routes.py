@@ -7,15 +7,12 @@ import repo
 router = APIRouter()
 
 # --- WebSockets ---
-
 @router.websocket("/ws/driver/{driver_id}")
 async def driver_socket(websocket: WebSocket, driver_id: str):
     await websocket.accept()
     try:
         while True:
             data = await websocket.receive_json()
-            
-            # Extract Name from Email (Default to 'Driver' if missing)
             email = data.get('email', '')
             name = email.split('@')[0] if '@' in email else "Driver"
             
@@ -43,7 +40,6 @@ async def driver_socket(websocket: WebSocket, driver_id: str):
         except Exception as e:
             print(f"Failed to update DB on disconnect: {e}")
 
-        # Broadcast update
         await manager.broadcast_to_riders()
 
 @router.websocket("/ws/riders")
@@ -56,7 +52,6 @@ async def rider_socket(websocket: WebSocket):
         manager.disconnect_rider(websocket)
 
 # --- HTTP Endpoints ---
-
 @router.post("/update-location")
 def update_location(data: LocationUpdate):
     try:
