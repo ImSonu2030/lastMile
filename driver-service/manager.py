@@ -25,7 +25,6 @@ class ConnectionManager:
             try:
                 await connection.send_json(active_data)
             except Exception:
-                # Handle broken connections gracefully (optionally remove them)
                 pass
 
     async def update_driver_location(self, driver_id: str, data: dict):
@@ -36,5 +35,4 @@ class ConnectionManager:
         if driver_id in self.driver_locations:
             self.driver_locations[driver_id]['status'] = 'offline'
 
-# Create a global instance to be imported by routes
 manager = ConnectionManager()

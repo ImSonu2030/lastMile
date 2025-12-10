@@ -24,8 +24,6 @@ async def driver_socket(websocket: WebSocket, driver_id: str):
                 "status": data['status'],
                 "last_updated": datetime.utcnow().isoformat()
             }
-            
-            # Update in-memory manager which broadcasts to riders
             await manager.update_driver_location(driver_id, payload)
             
     except WebSocketDisconnect:
