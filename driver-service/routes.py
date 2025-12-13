@@ -28,11 +28,8 @@ async def driver_socket(websocket: WebSocket, driver_id: str):
             
     except WebSocketDisconnect:
         print(f"Driver {driver_id} disconnected")
-        
-        # Mark offline in memory
         manager.mark_driver_offline(driver_id)
         
-        # Update DB to offline
         try:
             repo.set_driver_offline_db(driver_id)
         except Exception as e:
@@ -45,7 +42,7 @@ async def rider_socket(websocket: WebSocket):
     await manager.connect_rider(websocket)
     try:
         while True:
-            await websocket.receive_text() # Keep connection open
+            await websocket.receive_text() 
     except WebSocketDisconnect:
         manager.disconnect_rider(websocket)
 

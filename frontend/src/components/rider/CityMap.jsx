@@ -12,7 +12,6 @@ export default function CityMap({
         City Map (Live)
       </h2>
       <div className="relative w-full aspect-square bg-gray-900 border-2 border-gray-700 rounded-lg overflow-hidden">
-        {/* Grid Background */}
         <div
           className="absolute inset-0 opacity-20"
           style={{
@@ -22,7 +21,6 @@ export default function CityMap({
           }}
         ></div>
 
-        {/* Stations */}
         {stations.map((station) => (
           <div
             key={station.id}
@@ -44,7 +42,6 @@ export default function CityMap({
           </div>
         ))}
 
-        {/* Drivers */}
         {drivers.map((driver) => (
           <div
             key={driver.driver_id}
@@ -54,12 +51,10 @@ export default function CityMap({
               bottom: `${driver.y_coordinate}%`,
             }}
           >
-            {/* Display Name Badge */}
             <span className="bg-gray-900/80 text-white text-[10px] px-2 py-0.5 rounded-full mb-1 border border-gray-600 shadow-sm whitespace-nowrap">
               {driver.name || "Driver"}
             </span>
 
-            {/* Car Icon */}
             <span className="text-2xl" title={`Status: ${driver.status}`}>
               🚖
             </span>

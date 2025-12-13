@@ -10,14 +10,12 @@ export function useRiderLogic(user) {
   const [arrivalTime, setArrivalTime] = useState('');
   const [rideStatus, setRideStatus] = useState(null);
 
-  // Load Stations
   useEffect(() => {
     stationService.getAllStations()
       .then(setStations)
       .catch(err => console.error("Failed to load stations", err));
   }, []);
 
-  // WebSocket for Drivers
   useEffect(() => {
     const wsUrl = `${import.meta.env.VITE_DRIVER_SERVICE.replace('http', 'ws')}/ws/riders`;
     const ws = new WebSocket(wsUrl);
