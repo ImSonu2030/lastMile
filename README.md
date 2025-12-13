@@ -11,14 +11,14 @@ LastMile is a scalable, fault-tolerant ride-sharing platform designed to solve t
 
 - **Station Service**: Manages metadata for metro stations and locations.
 
-- **Maching Service**: Executes the logic to find the nearest driver for a ride request.
+- **Matching Service**: Executes the logic to find the nearest driver for a ride request.
 
 All services communicate via REST APIs, with the Nginx Ingress Controller acting as the API Gateway.
 
 ### Key Features
 - **Real-Time Tracking**: Live driver location updates using WebSockets for low-latency tracking on an interactive map.
 
-- **Proximity-Based Matching**: efficient algorithms to instantly match riders with the nearest available driver.
+- **Proximity-Based Matching**: Efficient algorithms to instantly match riders with the nearest available driver.
 
 - **Microservices Architecture**: Decoupled services for Users, Drivers, Stations, and Matching, ensuring independent scalability and maintenance.
 
@@ -28,7 +28,7 @@ All services communicate via REST APIs, with the Nginx Ingress Controller acting
 
 ---
 ### Getting Started
-1. **Prerequisites**: To get the project running locally, you'll need to have these installed into your system
+1. **Prerequisites**: To get the project running locally, you'll need to have these installed on your system:
     - Docker
     - Minikube
     - kubectl
@@ -41,7 +41,7 @@ All services communicate via REST APIs, with the Nginx Ingress Controller acting
         ```
     - Configure Secrets: 
         <br>
-        Create a kubernetes/lastmile-secrets.yml file to store your Supabase credentials. You can use the provided template or create one with the following structure:
+        Create a `kubernetes/lastmile-secrets.yml` file to store your Supabase credentials. You can use the provided template or create one with the following structure:
         ```YAML
         apiVersion: v1
         kind: Secret
@@ -63,10 +63,10 @@ All services communicate via REST APIs, with the Nginx Ingress Controller acting
 Once the services are running, you can access the frontend at `http://lastmile.local`
 
 ### Usage
-To test locally, access the app at `http://lastmile.local`. Open two browser windows (one Incognito) after that log in as a Driver in one and as a Rider in the other window then follow these steps,
+To test locally, access the app at `http://lastmile.local`. Open two browser windows (one Incognito). Log in as a Driver in one and as a Rider in the other, then follow these steps:
 1. **Register/Login**: 
     - Create an account as a Rider or Driver and log in. 
-    - You'll receive a confirmation mail from Supabase. Just click on that to verify the your mail ID.
+    - You'll receive a confirmation email from Supabase. Just click on that to verify your email ID.
 2.  **For Drivers**:
     - Go Online: Click "Go Online" on the dashboard to become available.
     - Auto-Match: When matched, you will receive a notification and automatically "drive" to the pickup station on the map.
@@ -88,11 +88,12 @@ To test locally, access the app at `http://lastmile.local`. Open two browser win
 <p align="left">
   <img src="https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" width="30" alt="React" title="React" style="margin-right: 10px;" />
   <img src="https://vitejs.dev/logo.svg" width="30" alt="Vite" title="Vite" style="margin-right: 10px;"/>
-  <img src="https://tailwindcss.com/_next/static/media/tailwindcss-mark.d52e9897.svg" width="30" alt="Tailwind CSS" title="Tailswind css" style="margin-right: 10px;"/>
+  <img src="https://tailwindcss.com/_next/static/media/tailwindcss-mark.d52e9897.svg" width="30" alt="Tailwind CSS" title="Tailwind CSS" style="margin-right: 10px;"/>
   <img src="https://img.icons8.com/?size=30&id=13441&format=png&color=000000" alt="Python" title="Python" style="margin-right: 10px;"/>
   <img src="https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png" width="100" alt="fastAPI" title="fastAPI" style="margin-right: 10px;"/>
   <img src="https://img.icons8.com/?size=30&id=cvzmaEA4kC0o&format=png&color=000000" alt="Kubernetes" title="Kubernetes" style="margin-right: 10px;"/>
   <img src="https://img.icons8.com/?size=30&id=TkG10j-DmXkU&format=png&color=000000" alt="Docker" title="Docker" style="margin-right: 10px;"/>
   <img src="https://img.icons8.com/?size=30&id=dqxpEvJOf55J&format=png&color=000000" alt="Jenkins" title="Jenkins" style="margin-right: 10px;"/>
   <img src="https://www.postgresql.org/media/img/about/press/elephant.png" width="30" alt="PostgreSQL" title="PostgreSQL" style="margin-right: 10px;"/>
+  <img src="https://raw.githubusercontent.com/ImSonu2030/lastMile/main/frontend/src/assets/supabase-logo-wordmark--dark.png" width="100" alt="Supabase" title="Supabase" style="margin-right: 10px;padding-bottom:5px;"/>
 </p>
